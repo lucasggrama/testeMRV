@@ -19,7 +19,7 @@ public class LeadServices {
         return leadRepositorio.findAll();
     }
 
-    public Lead add(Lead lead) {
+    public Lead save(Lead lead) {
         return leadRepositorio.save(lead);
     }
 
@@ -27,17 +27,23 @@ public class LeadServices {
         leadRepositorio.deleteById(id);
     }
 
-    public Lead updateStatus(Long id, LeadStatus newStatus) {
+    public Lead acceptLead(Long id) {
         Lead lead = leadRepositorio.findById(id)
                 .orElseThrow(() -> new RuntimeException("Lead com ID: " + id + " não existe"));
         
-        if (newStatus == LeadStatus.ACCEPTED && lead.getPrice() > 500.0) {
+        if (lead.getPrice() > 500.0) {
             Double discount = 0.10;
             Double newPrice = lead.getPrice() * (1 - discount);
             lead.setPrice(newPrice);
         }
-        lead.setStatus(newStatus);
+        lead.setStatus(LeadStatus.ACCEPTED);
         return leadRepositorio.save(lead);
     }
     
+    public Lead declineLead(Long id) {
+        Lead lead = leadRepositorio.findById(id)
+                .orElseThrow(() -> new RuntimeException("Lead com ID: " + id + " não existe"));
+        lead.setStatus(LeadStatus.DECLINED);
+        return leadRepositorio.save(lead);
+    }
 }

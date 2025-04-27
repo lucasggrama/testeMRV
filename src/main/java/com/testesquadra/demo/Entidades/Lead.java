@@ -7,6 +7,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
+
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -17,6 +19,9 @@ public class Lead {
     @GeneratedValue
     private Long id;
     private String firstName;
+    private String lastName;
+    private String email;
+    private String phone;    
     private Date dateCreated;
     private String suburb;
     private String category;
