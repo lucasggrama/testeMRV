@@ -4,6 +4,73 @@
 <head>
     <meta charset="UTF-8">
     <title>Lista de Leads</title>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('leadForm');
+            form.addEventListener('submit', function (event) {
+                event.preventDefault(); // Não recarrega a página
+
+                const formData = {
+                    firstName: document.getElementById('firstName').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value,
+                    suburb: document.getElementById('suburb').value,
+                    category: document.getElementById('category').value,
+                    description: document.getElementById('description').value,
+                    price: parseFloat(document.getElementById('price').value)
+                };
+
+                fetch('/leads/save', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                })
+                    .then(response => {
+                        // Verifique se a resposta foi bem-sucedida
+                        if (!response.ok) {
+                            throw new Error(`Erro ao cadastrar o lead: ${response.statusText}`);
+                        }
+                        // Leia o corpo da resposta
+                        return response.json(); // Apenas uma vez
+                    })
+                    .then(data => {
+                        console.log(data); // Verifique o conteúdo do JSON
+                        if (data && data.id) {
+                            alert('Lead cadastrado com sucesso!');
+                            atualizarListaLeads(); // Atualiza a lista de leads sem recarregar a página
+                        } else {
+                            alert('Erro ao cadastrar o lead.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro ao salvar o lead:', error);
+                        alert('Não foi possível cadastrar o lead.');
+                    });
+            });
+        });
+        function atualizarListaLeads() {
+            fetch('/listLeads')
+                .then(response => response.json())
+                .then(leads => {
+                    const listaLeads = document.getElementById('listaLeads');
+                    listaLeads.innerHTML = '';  // Limpar a lista atual
+
+                    // Adicionar os novos leads à lista
+                    leads.forEach(lead => {
+                        const leadElement = document.createElement('li');
+                        leadElement.textContent = `${lead.firstName} - ${lead.email}`;
+                        listaLeads.appendChild(leadElement);
+                    });
+                })
+                .catch(error => console.error('Erro ao atualizar a lista de leads:', error));
+        }
+
+    </script>
+    <!--  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">        
+    -->
     <script>
         function filterLeads(status) {
             const cards = document.querySelectorAll('.lead-card');
@@ -28,7 +95,14 @@
                     if (leadStatus === 'ACCEPTED') {
                         card.style.display = '';
                         invitedElements.forEach(el => el.style.display = 'none');
-                        acceptedElements.forEach(el => el.style.display = '');
+                        acceptedElements.forEach(el => el.style.display = ''); const priceElement = card.querySelector('#preco span');
+                        if (priceElement) {
+                            let originalPrice = parseFloat(priceElement.getAttribute('data-original-price'));
+                            if (!isNaN(originalPrice)) {
+                                priceElement.textContent = originalPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                            }
+                        }
+
                     } else {
                         card.style.display = 'none';
                     }
@@ -42,7 +116,8 @@
                 btn.classList.remove('active');
             });
             document.querySelector(`.btn[onclick="filterLeads('${status}')"]`).classList.add('active');
-        } function acceptLead(button, leadId) {
+        } // teste
+        function acceptLead(button, leadId) {
             console.log('Aceitando lead com ID:', leadId);
             fetch(`/leads/accept/${leadId}`, {
                 method: 'POST'
@@ -57,25 +132,24 @@
                     const card = button.closest('.lead-card');
                     card.setAttribute('data-status', 'ACCEPTED');
 
-                    // Hide invited elements and show accepted elements
+                    const priceElement = card.querySelector('#preco span');
+                    if (priceElement && data.price !== undefined) {
+                        priceElement.textContent = data.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                        priceElement.setAttribute('data-original-price', data.price); // Salvar preço atualizado
+                    }
+
                     card.querySelectorAll('.invited').forEach(el => el.style.display = 'none');
                     card.querySelectorAll('.accepted').forEach(el => el.style.display = '');
 
-                    // Update the status text
                     const statusElement = card.querySelector('li:last-child span');
                     if (statusElement) {
                         statusElement.textContent = 'ACCEPTED';
                     }
                     console.log('Lead aceito com sucesso!', data);
 
-                    // Reaplicar o filtro atual
                     const activeFilter = document.querySelector('.btn.active')?.dataset.filter || 'INVITED';
                     filterLeads(activeFilter);
                 })
-                .catch(error => {
-                    console.error('Erro ao aceitar lead:', error);
-                    alert('Não foi possível aceitar o lead. Tente novamente.');
-                });
         }
         function declineLead(button, leadId) {
             console.log('Recusando lead com ID:', leadId);
@@ -107,7 +181,7 @@
                 })
                 .catch(error => {
                     console.error('Erro ao aceitar lead:', error);
-                    alert('Não foi possível aceitar o lead. Tente novamente.');
+                    console.log('Não foi possível aceitar o lead. Tente novamente.');
                 });
         }
 
@@ -134,7 +208,7 @@
                             <span class="invited" th:text="${lead.firstName}"></span>
                             <span class="accepted" th:text="${lead.firstName}"></span>
                         </h5>
-                        <ul class="list-unstyled"></ul>
+                        <ul id='listaLeads' class="list-unstyled"></ul>
                         <li class="accepted" th:text="'Email: ' + ${lead.email}"></li>
                         <li class="accepted" th:text="'Telefone: ' + ${lead.phone}"></li>
                         <li>Data de Criação: <span th:text="${#dates.format(lead.dateCreated, 'dd/MM/yyyy')}"></span>
@@ -142,8 +216,7 @@
                         <li>Bairro: <span th:text="${lead.suburb}"></span></li>
                         <li>Categoria: <span th:text="${lead.category}"></span></li>
                         <li>Descrição: <span th:text="${lead.description}"></span></li>
-                        <li>Preço: R$<span th:text="${lead.price}"></span></li>
-                        <li>Status: <span th:text="${lead.status}"></span></li>
+                        <li id="preco">Preço: R$<span th:text="${lead.price}"></span></li>
                         <li class="invited">
                             <button class="btn btn-success invited"
                                 th:onclick="|acceptLead(this, '${lead.id}')|">Accept</button>
@@ -152,59 +225,48 @@
                             <button class="btn btn-success invited"
                                 th:onclick="|declineLead(this, '${lead.id}')|">Decline</button>
                         </li>
-                        
+
                         </ul>
                     </div>
                 </div>
             </div>
         </div>
+        <div class="container mt-4">
+            <h2>Cadastrar Novo Lead</h2>
+            <form id="leadForm">
+                <div class="mb-3">
+                    <label for="firstName" class="form-label">Nome</label>
+                    <input type="text" class="form-control" id="firstName" name="firstName" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="phone" class="form-label">Telefone</label>
+                    <input type="text" class="form-control" id="phone" name="phone" required>
+                </div>
+                <div class="mb-3">
+                    <label for="suburb" class="form-label">Bairro</label>
+                    <input type="text" class="form-control" id="suburb" name="suburb" required>
+                </div>
+                <div class="mb-3">
+                    <label for="category" class="form-label">Categoria</label>
+                    <input type="text" class="form-control" id="category" name="category" required>
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Descrição</label>
+                    <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="price" class="form-label">Preço</label>
+                    <input type="number" class="form-control" id="price" name="price" step="0.01" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Cadastrar Lead</button>
+            </form>
+        </div>
 
-        <h3 class="mt-5">Cadastrar Novo Lead</h3>
-        <form th:action="@{/leads/save}" method="post" class="row g-3 mt-3">
-            <div class="col-md-6"></div>
-            <label for="firstName" class="form-label">Primeiro Nome</label>
-            <input type="text" class="form-control" id="firstName" name="firstName" required>
-    </div>
-    <div class="col-md-6">
-        <label for="lastName" class="form-label">Último Nome</label>
-        <input type="text" class="form-control" id="lastName" name="lastName" required>
-    </div>
-    <div class="col-md-6">
-        <label for="email" class="form-label">Email</label>
-        <input type="email" class="form-control" id="email" name="email" required>
-    </div>
-    <div class="col-md-6">
-        <label for="phone" class="form-label">Telefone</label>
-        <input type="text" class="form-control" id="phone" name="phone" required>
-    </div>
-    <div class="col-md-6">
-        <label for="suburb" class="form-label">Bairro</label>
-        <input type="text" class="form-control" id="suburb" name="suburb" required>
-    </div>
-    <div class="col-md-6">
-        <label for="category" class="form-label">Categoria</label>
-        <input type="text" class="form-control" id="category" name="category" required>
-    </div>
-    <div class="col-md-12">
-        <label for="description" class="form-label">Descrição</label>
-        <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
-    </div>
-    <div class="col-md-6">
-        <label for="price" class="form-label">Preço</label>
-        <input type="number" class="form-control" id="price" name="price" step="0.01" required>
-    </div>
-    <div class="col-md-6">
-        <label for="status" class="form-label">Status</label>
-        <select class="form-select" id="status" name="status" required>
-            <option value="INVITED">INVITED</option>
-            <option value="ACCEPTED">ACCEPTED</option>
-        </select>
-    </div>
-    <div class="col-12">
-        <button type="submit" class="btn btn-primary">Cadastrar</button>
-    </div>
-    </form>
-    </div>
+
 </body>
 
 </html>
