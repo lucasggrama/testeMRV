@@ -55,20 +55,93 @@
             fetch('/listLeads')
                 .then(response => response.json())
                 .then(leads => {
-                    const listaLeads = document.getElementById('listaLeads');
-                    listaLeads.innerHTML = '';  // Limpar a lista atual
+                    const leadsContainer = document.getElementById('leadsContainer');
+                    leadsContainer.innerHTML = '';  // Limpar os cards antigos
 
-                    // Adicionar os novos leads à lista
                     leads.forEach(lead => {
-                        const leadElement = document.createElement('li');
-                        leadElement.textContent = `${lead.firstName} - ${lead.email}`;
-                        listaLeads.appendChild(leadElement);
+                        const col = document.createElement('div');
+                        col.className = 'col-md-4 mb-4';
+
+                        const card = document.createElement('div');
+                        card.className = 'card lead-card h-100';
+                        card.setAttribute('data-status', lead.status);
+
+                        const cardBody = document.createElement('div');
+                        cardBody.className = 'card-body';
+
+                        const title = document.createElement('h5');
+                        title.className = 'card-title';
+                        title.textContent = lead.firstName;
+
+                        const ul = document.createElement('ul');
+                        ul.className = 'list-unstyled';
+
+                        const emailLi = document.createElement('li');
+                        emailLi.textContent = `Email: ${lead.email}`;
+
+                        const phoneLi = document.createElement('li');
+                        phoneLi.textContent = `Telefone: ${lead.phone}`;
+
+                        const dateLi = document.createElement('li');
+                        const dataFormatada = new Date(lead.dateCreated).toLocaleDateString('pt-BR');
+                        dateLi.innerHTML = `Data de Criação: <span>${dataFormatada}</span>`;
+
+                        const suburbLi = document.createElement('li');
+                        suburbLi.innerHTML = `Bairro: <span>${lead.suburb}</span>`;
+
+                        const categoryLi = document.createElement('li');
+                        categoryLi.innerHTML = `Categoria: <span>${lead.category}</span>`;
+
+                        const descriptionLi = document.createElement('li');
+                        descriptionLi.innerHTML = `Descrição: <span>${lead.description}</span>`;
+
+                        const priceLi = document.createElement('li');
+                        priceLi.id = 'preco';
+                        priceLi.innerHTML = `Preço: R$<span data-original-price="${lead.price}">${lead.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>`;
+
+                        ul.appendChild(emailLi);
+                        ul.appendChild(phoneLi);
+                        ul.appendChild(dateLi);
+                        ul.appendChild(suburbLi);
+                        ul.appendChild(categoryLi);
+                        ul.appendChild(descriptionLi);
+                        ul.appendChild(priceLi);
+
+                        if (lead.status === 'INVITED') {
+                            const acceptBtn = document.createElement('button');
+                            acceptBtn.className = 'btn btn-success invited';
+                            acceptBtn.textContent = 'Accept';
+                            acceptBtn.onclick = () => acceptLead(acceptBtn, lead.id);
+
+                            const declineBtn = document.createElement('button');
+                            declineBtn.className = 'btn btn-danger invited';
+                            declineBtn.textContent = 'Decline';
+                            declineBtn.onclick = () => declineLead(declineBtn, lead.id);
+
+                            const acceptLi = document.createElement('li');
+                            acceptLi.appendChild(acceptBtn);
+
+                            const declineLi = document.createElement('li');
+                            declineLi.appendChild(declineBtn);
+
+                            ul.appendChild(acceptLi);
+                            ul.appendChild(declineLi);
+                        }
+
+                        cardBody.appendChild(title);
+                        cardBody.appendChild(ul);
+                        card.appendChild(cardBody);
+                        col.appendChild(card);
+
+                        leadsContainer.appendChild(col);
                     });
+
+                    // Reaplicar filtro se necessário
+                    const activeFilter = document.querySelector('.btn.active')?.getAttribute('onclick')?.match(/filterLeads\('(.+)'\)/)?.[1] || 'INVITED';
+                    filterLeads(activeFilter);
                 })
                 .catch(error => console.error('Erro ao atualizar a lista de leads:', error));
-        }
-
-    </script>
+        }    </script>
     <!--  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">        
     -->
     <script>
@@ -132,21 +205,20 @@
                     const card = button.closest('.lead-card');
                     card.setAttribute('data-status', 'ACCEPTED');
 
-                    const priceElement = card.querySelector('#preco span');
+/*                    const priceElement = card.querySelector('#preco span');
                     if (priceElement && data.price !== undefined) {
                         priceElement.textContent = data.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                         priceElement.setAttribute('data-original-price', data.price); // Salvar preço atualizado
                     }
-
+*/
                     card.querySelectorAll('.invited').forEach(el => el.style.display = 'none');
                     card.querySelectorAll('.accepted').forEach(el => el.style.display = '');
-
                     const statusElement = card.querySelector('li:last-child span');
                     if (statusElement) {
                         statusElement.textContent = 'ACCEPTED';
                     }
                     console.log('Lead aceito com sucesso!', data);
-
+                    atualizarListaLeads();
                     const activeFilter = document.querySelector('.btn.active')?.dataset.filter || 'INVITED';
                     filterLeads(activeFilter);
                 })
@@ -206,7 +278,7 @@
                     <div class="card-body">
                         <h5 class="card-title">
                             <span class="invited" th:text="${lead.firstName}"></span>
-                            <span class="accepted" th:text="${lead.firstName}"></span>
+                            <span class="accepted" th:text="${lead.firstName} + ' ' + ${lead.lastName}"></span>
                         </h5>
                         <ul id='listaLeads' class="list-unstyled"></ul>
                         <li class="accepted" th:text="'Email: ' + ${lead.email}"></li>
@@ -231,40 +303,7 @@
                 </div>
             </div>
         </div>
-        <div class="container mt-4">
-            <h2>Cadastrar Novo Lead</h2>
-            <form id="leadForm">
-                <div class="mb-3">
-                    <label for="firstName" class="form-label">Nome</label>
-                    <input type="text" class="form-control" id="firstName" name="firstName" required>
-                </div>
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="email" name="email" required>
-                </div>
-                <div class="mb-3">
-                    <label for="phone" class="form-label">Telefone</label>
-                    <input type="text" class="form-control" id="phone" name="phone" required>
-                </div>
-                <div class="mb-3">
-                    <label for="suburb" class="form-label">Bairro</label>
-                    <input type="text" class="form-control" id="suburb" name="suburb" required>
-                </div>
-                <div class="mb-3">
-                    <label for="category" class="form-label">Categoria</label>
-                    <input type="text" class="form-control" id="category" name="category" required>
-                </div>
-                <div class="mb-3">
-                    <label for="description" class="form-label">Descrição</label>
-                    <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
-                </div>
-                <div class="mb-3">
-                    <label for="price" class="form-label">Preço</label>
-                    <input type="number" class="form-control" id="price" name="price" step="0.01" required>
-                </div>
-                <button type="submit" class="btn btn-primary">Cadastrar Lead</button>
-            </form>
-        </div>
+
 
 
 </body>

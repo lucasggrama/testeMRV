@@ -30,16 +30,22 @@ public class LeadServices {
     public Lead acceptLead(Long id) {
         Lead lead = leadRepositorio.findById(id)
                 .orElseThrow(() -> new RuntimeException("Lead com ID: " + id + " não existe"));
-        
+
         if (lead.getPrice() > 500.0) {
             Double discount = 0.10;
             Double newPrice = lead.getPrice() * (1 - discount);
             lead.setPrice(newPrice);
         }
         lead.setStatus(LeadStatus.ACCEPTED);
+        EmailService emailService = new EmailService();
+        emailService.sendEmail(
+                "vendas@test.com",
+                "Lead Aceito",
+                "O lead do (a) " + lead.getFirstName() + " foi aceito com preço de " + lead.getPrice());
+
         return leadRepositorio.save(lead);
     }
-    
+
     public Lead declineLead(Long id) {
         Lead lead = leadRepositorio.findById(id)
                 .orElseThrow(() -> new RuntimeException("Lead com ID: " + id + " não existe"));
