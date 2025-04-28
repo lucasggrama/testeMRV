@@ -1,11 +1,8 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Inicializa os ícones
     initIcons();
     
-    // Configura os filtros
     filterLeads('INVITED');
     
-    // Configura os botões de filtro
     setupFilterButtons();
 });
 
@@ -51,7 +48,6 @@ function atualizarListaLeads() {
                 const cardBody = document.createElement('div');
                 cardBody.className = 'card-body';
 
-                // Título com ícone
                 const title = document.createElement('h5');
                 title.className = 'card-title';
                 
@@ -75,12 +71,10 @@ function atualizarListaLeads() {
                 lastNameSpan.textContent = lead.lastName;
                 title.appendChild(lastNameSpan);
 
-                // Lista de informações
                 const ul = document.createElement('ul');
                 ul.className = 'list-unstyled';
                 ul.id = 'listaLeads';
 
-                // Função auxiliar para criar itens da lista
                 const addListItem = (text, className = '') => {
                     const li = document.createElement('li');
                     if (className) li.className = className;
@@ -88,56 +82,37 @@ function atualizarListaLeads() {
                     ul.appendChild(li);
                     return li;
                 };
-
-                // Data
                 const dateLi = document.createElement('li');
                 dateLi.textContent = 'Data: ';
                 const dateSpan = document.createElement('span');
                 dateSpan.textContent = new Date(lead.dateCreated).toLocaleDateString('pt-BR');
                 dateLi.appendChild(dateSpan);
                 ul.appendChild(dateLi);
-
-                // Email e Telefone
                 addListItem(`Email: ${lead.email}`, 'accepted');
                 addListItem(`Telefone: ${lead.phone}`, 'accepted');
-
-                // Lista do meio
                 const listMiddle = document.createElement('div');
                 listMiddle.className = 'list-middle';
-
-                // Localização
                 const locationLi = document.createElement('li');
                 const locationIcon = document.createElement('i');
                 locationIcon.className = 'fa-solid fa-location-dot';
                 locationLi.appendChild(locationIcon);
                 locationLi.appendChild(document.createTextNode(' ' + lead.suburb));
                 listMiddle.appendChild(locationLi);
-
-                // Categoria
                 const categoryLi = document.createElement('li');
                 const categoryIcon = document.createElement('i');
                 categoryIcon.className = 'fa-solid fa-briefcase';
                 categoryLi.appendChild(categoryIcon);
                 categoryLi.appendChild(document.createTextNode(' ' + lead.category));
                 listMiddle.appendChild(categoryLi);
-
-                // ID
                 const idLi = document.createElement('li');
                 idLi.innerHTML = `ID: <span>${lead.id}</span>`;
                 listMiddle.appendChild(idLi);
-
                 ul.appendChild(listMiddle);
-
-                // Descrição
                 addListItem(`Descrição: ${lead.description}`);
-
-                // Preço
                 const priceLi = document.createElement('li');
                 priceLi.id = 'preco';
-                priceLi.innerHTML = `Preço: R$<span data-original-price="${lead.price}">${lead.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>`;
+                priceLi.innerHTML = `Preço: <span data-original-price="${lead.price}">${lead.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>`;
                 ul.appendChild(priceLi);
-
-                // Botões
                 const buttonsDiv = document.createElement('div');
                 buttonsDiv.id = 'btns';
 
@@ -158,7 +133,6 @@ function atualizarListaLeads() {
 
                 ul.appendChild(buttonsDiv);
 
-                // Montar o card
                 cardBody.appendChild(title);
                 cardBody.appendChild(ul);
                 card.appendChild(cardBody);
@@ -167,11 +141,9 @@ function atualizarListaLeads() {
                 leadsContainer.appendChild(col);
             });
 
-            // Reaplicar filtro
             const activeFilter = document.querySelector('.filter-btn.selected')?.getAttribute('onclick')?.match(/filterLeads\('(.+)'\)/)?.[1] || 'INVITED';
             filterLeads(activeFilter);
             
-            // Re-inicializar ícones
             initIcons();
         })
         .catch(error => console.error('Erro ao atualizar a lista de leads:', error));
@@ -229,7 +201,6 @@ function acceptLead(button, leadId) {
         const card = button.closest('.lead-card');
         card.setAttribute('data-status', 'ACCEPTED');
         
-        // Atualiza o preço
         const priceElement = card.querySelector('#preco span');
         if (priceElement) {
             priceElement.textContent = updatedLead.price.toLocaleString('pt-BR', { 
@@ -239,15 +210,12 @@ function acceptLead(button, leadId) {
             priceElement.setAttribute('data-original-price', updatedLead.price);
         }
         
-        // Atualiza a exibição
         card.querySelectorAll('.invited').forEach(el => el.style.display = 'none');
         card.querySelectorAll('.accepted').forEach(el => el.style.display = '');
         
-        // Remove os botões
         const buttonsDiv = card.querySelector('#btns');
         if (buttonsDiv) buttonsDiv.remove();
         
-        // Reaplica o filtro
         const activeFilter = document.querySelector('.filter-btn.selected')?.getAttribute('onclick')?.match(/filterLeads\('(.+)'\)/)?.[1] || 'INVITED';
         filterLeads(activeFilter);
     })
@@ -266,7 +234,6 @@ function declineLead(button, leadId) {
         return response.json();
     })
     .then(() => {
-        // Remove o card do lead recusado
         button.closest('.col-md-4').remove();
     })
     .catch(error => {

@@ -28,11 +28,12 @@
                             <span class="accepted" th:text="${lead.lastName}"></span>
                         </h5>
                         <ul id='listaLeads' class="list-unstyled">
-                            <li>Data: <span
-                                    th:text="${#dates.format(lead.dateCreated, 'dd/MM/yyyy')}"></span>
+                            <li>Data: <span th:text="${#dates.format(lead.dateCreated, 'dd/MM/yyyy')}"></span>
                             </li>
-                            <li class="accepted" th:text="'Email: ' + ${lead.email}"></li>
-                            <li class="accepted" th:text="'Telefone: ' + ${lead.phone}"></li>
+                            <div class="list-middle accepted">
+                                <li class="accepted" th:text="'Email: ' + ${lead.email}"></li>
+                                <li class="accepted" th:text="'Telefone: ' + ${lead.phone}"></li>
+                            </div>
                             <div class="list-middle">
 
                                 <li><i class="fa-solid fa-location-dot"></i><span th:text="' ' + ${lead.suburb}"></span>
