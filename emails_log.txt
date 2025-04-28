@@ -1,0 +1,84 @@
+=== Novo Email ===
+Data/Hora: 2025-04-28T09:08:10.502155799
+Para: vendas@test.com
+Assunto: Lead Aceito
+Corpo: O lead do (a) Lucas foi aceito com preço de 729.0
+====================
+
+=== Novo Email ===
+Data/Hora: 2025-04-28T12:21:07.218629076
+Para: vendas@test.com
+Assunto: Lead Aceito
+Corpo: O lead do (a) teste foi aceito com preço de 729.0
+====================
+
+=== Novo Email ===
+Data/Hora: 2025-04-28T12:29:46.217807056
+Para: vendas@test.com
+Assunto: Lead Aceito
+Corpo: O lead do (a) teste foi aceito com preço de 11070.0
+====================
+
+=== Novo Email ===
+Data/Hora: 2025-04-28T12:33:37.138005524
+Para: vendas@test.com
+Assunto: Lead Aceito
+Corpo: O lead do (a) Lucas foi aceito com preço de 656.1
+====================
+
+=== Novo Email ===
+Data/Hora: 2025-04-28T12:33:37.138005456
+Para: vendas@test.com
+Assunto: Lead Aceito
+Corpo: O lead do (a) Lucas foi aceito com preço de 656.1
+====================
+
+=== Novo Email ===
+Data/Hora: 2025-04-28T12:33:50.703376708
+Para: vendas@test.com
+Assunto: Lead Aceito
+Corpo: O lead do (a) Accpeted foi aceito com preço de 729.0
+====================
+
+=== Novo Email ===
+Data/Hora: 2025-04-28T12:44:08.215355651
+Para: vendas@test.com
+Assunto: Lead Aceito
+Corpo: O lead do (a) teste foi aceito com preço de 656.1
+====================
+
+=== Novo Email ===
+Data/Hora: 2025-04-28T12:50:01.614993657
+Para: vendas@test.com
+Assunto: Lead Aceito
+Corpo: O lead do (a) teste foi aceito com preço de 9963.0
+====================
+
+=== Novo Email ===
+Data/Hora: 2025-04-28T13:57:29.238615098
+Para: vendas@test.com
+Assunto: Lead Aceito
+Corpo: O lead do (a) Lucas foi aceito com preço de 891.0
+====================
+
+=== Novo Email ===
+Data/Hora: 2025-04-28T14:23:28.119888091
+Para: vendas@test.com
+Assunto: Lead Aceito
+Corpo: O lead do (a) Lucia foi aceito com preço de 1080.0
+====================
+
+=== Novo Email ===
+Data/Hora: 2025-04-28T14:23:36.258548621
+Para: vendas@test.com
+Assunto: Lead Aceito
+Corpo: O lead do (a) João foi aceito com preço de 2250.0
+====================
+
+=== Novo Email ===
+Data/Hora: 2025-04-28T14:41:27.792129037
+Para: vendas@test.com
+Assunto: Lead Aceito
+Corpo: O lead do (a) Maria foi aceito com preço de 720.0
+====================
+
