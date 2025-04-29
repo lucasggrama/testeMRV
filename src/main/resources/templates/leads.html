@@ -13,9 +13,8 @@
 <body>
     <div class="container mt-4">
         <div class="filter-btns">
-            <button class="btn btn-primary filter-btn selected" onclick="filterLeads('INVITED')">Mostrar
-                INVITED</button>
-            <button class="btn btn-success filter-btn" onclick="filterLeads('ACCEPTED')">Mostrar ACCEPTED</button>
+            <button class="btn btn-primary filter-btn selected" onclick="filterLeads('INVITED')">Invited</button>
+            <button class="btn btn-success filter-btn" onclick="filterLeads('ACCEPTED')">Accepted</button>
         </div>
         <div class="row" id="leadsContainer">
             <div class="col-md-4 mb-4" th:each="lead : ${leads}">
